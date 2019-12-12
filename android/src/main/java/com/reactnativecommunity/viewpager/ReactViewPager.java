@@ -7,8 +7,6 @@
 
 package com.reactnativecommunity.viewpager;
 
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper view for {@link ViewPager}. It's forwarding calls to {@link ViewGroup#addView} to add
- * views to custom {@link PagerAdapter} instance which is used by {@link NativeViewHierarchyManager}
+ * Wrapper view for {@link AndroidViewPager}. It's forwarding calls to {@link ViewGroup#addView} to add
+ * views to custom {@link AndroidPageAdapter} instance which is used by {@link com.facebook.react.uimanager.NativeViewHierarchyManager}
  * to add children nodes according to react views hierarchy.
  */
 public class ReactViewPager extends VerticalViewPager {
 
-  private class Adapter extends PagerAdapter {
+  private class Adapter extends AndroidPageAdapter {
 
     private final List<View> mViews = new ArrayList<>();
     private boolean mIsViewPagerInIntentionallyInconsistentState = false;
@@ -61,7 +59,7 @@ public class ReactViewPager extends VerticalViewPager {
      * After calling this, it is expected that notifyDataSetChanged should be called soon
      * afterwards.
      */
-    void removeAllViewsFromAdapter(ViewPager pager) {
+    void removeAllViewsFromAdapter(AndroidViewPager pager) {
       mViews.clear();
       pager.removeAllViews();
       // set this, so that when the next addViews is called, we return POSITION_NONE for every
@@ -104,7 +102,7 @@ public class ReactViewPager extends VerticalViewPager {
     }
   }
 
-  private class PageChangeListener implements ViewPager.OnPageChangeListener {
+  private class PageChangeListener implements AndroidViewPager.OnPageChangeListener {
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

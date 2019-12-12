@@ -1,17 +1,13 @@
 package com.reactnativecommunity.viewpager;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import androidx.viewpager.widget.ViewPager;
-
 // Vertical ViewPager implement, original code from
 // https://android.googlesource.com/platform/packages/apps/DeskClock/+/master/src/com/android/deskclock/VerticalViewPager.java
-public class VerticalViewPager extends ViewPager {
-    private boolean mVertical = false;
+public class VerticalViewPager extends AndroidViewPager {
     private GestureDetector mGestureDetector;
 
     public VerticalViewPager(Context context) {
@@ -92,7 +88,7 @@ public class VerticalViewPager extends ViewPager {
         return ev;
     }
 
-    private static final class VerticalPageTransformer implements ViewPager.PageTransformer {
+    private static final class VerticalPageTransformer implements AndroidViewPager.PageTransformer {
         @Override
         public void transformPage(View view, float position) {
             final int pageWidth = view.getWidth();
