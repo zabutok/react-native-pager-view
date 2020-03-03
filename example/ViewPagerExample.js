@@ -46,6 +46,13 @@ const TestComponent = props => {
   );
 };
 
+const TestComponent2 = props => {
+  return (
+    <View style={props.style}>
+      <View />
+    </View>
+  );
+};
 export default class ViewPagerExample extends React.Component<*, State> {
   viewPager: React.Ref<typeof ViewPager>;
 
@@ -132,7 +139,10 @@ export default class ViewPagerExample extends React.Component<*, State> {
           transitionStyle="scroll"
           showPageIndicator={dotsVisible}
           ref={this.viewPager}>
-          <TestComponent bg="red" />
+          <View style={{flex: 1, backgroundColor: 'pink'}}>
+            <View style={{flex: 1}} />
+          </View>
+          <TestComponent2 style={{flex: 1, backgroundColor: 'black'}} />
           <TestComponent bg="blue" />
           <TestComponent bg="green" />
         </ViewPager>
