@@ -38,6 +38,14 @@ type State = {
   dotsVisible: boolean,
 };
 
+const TestComponent = props => {
+  return (
+    <View style={{flex: 1}}>
+      <View style={{backgroundColor: props.bg, flex: 1}} />
+    </View>
+  );
+};
+
 export default class ViewPagerExample extends React.Component<*, State> {
   viewPager: React.Ref<typeof ViewPager>;
 
@@ -102,16 +110,6 @@ export default class ViewPagerExample extends React.Component<*, State> {
     }
   };
 
-  renderPage(page: CreatePage) {
-    return (
-      <View key={page.key} style={page.style} collapsable={false}>
-        {/* $FlowFixMe */}
-        <Image style={styles.image} source={page.imgSource} />
-        <LikeCount />
-      </View>
-    );
-  }
-
   toggleDotsVisibility = () => {
     this.setState(prevState => ({dotsVisible: !prevState.dotsVisible}));
   };
@@ -134,7 +132,9 @@ export default class ViewPagerExample extends React.Component<*, State> {
           transitionStyle="scroll"
           showPageIndicator={dotsVisible}
           ref={this.viewPager}>
-          {pages.map(p => this.renderPage(p))}
+          <TestComponent bg="red" />
+          <TestComponent bg="blue" />
+          <TestComponent bg="green" />
         </ViewPager>
         <View style={styles.buttons}>
           <Button
