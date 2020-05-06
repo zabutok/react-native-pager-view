@@ -101,9 +101,12 @@ class ViewPager extends React.Component<ViewPagerProps> {
   };
 
   _onPageScroll = (e: PageScrollEvent) => {
+    this.isScrolling = e.nativeEvent.offset > 0;
+    // console.log(this.isScrolling);
     if (this.props.onPageScroll) {
       this.props.onPageScroll(e);
     }
+
     // Not implemented on iOS yet
     if (Platform.OS === 'android') {
       if (this.props.keyboardDismissMode === 'on-drag') {
@@ -116,7 +119,8 @@ class ViewPager extends React.Component<ViewPagerProps> {
     if (this.props.onPageScrollStateChanged) {
       this.props.onPageScrollStateChanged(e);
     }
-    this.isScrolling = e.nativeEvent.pageScrollState === 'dragging';
+    // console.log(e.nativeEvent.pageScrollState);
+    // this.isScrolling = e.nativeEvent.pageScrollState === 'dragging';
   };
 
   _onPageSelected = (e: PageSelectedEvent) => {
@@ -162,11 +166,13 @@ class ViewPager extends React.Component<ViewPagerProps> {
     );
   };
 
-  _onMoveShouldSetResponderCapture = () => {
-    if (Platform.OS === 'ios') {
-      return this.isScrolling;
-    }
-    return false;
+  /**
+   * `ViewPager` wants to prevent a child `View` from becoming responder on a move
+   * See https://github.com/react-native-community/react-native-viewpager/issues/164
+   */
+  _onMoveShouldSetResponderCapture = event => {
+    console.log(event.nativeEvent);
+    return true;
   };
 
   render() {

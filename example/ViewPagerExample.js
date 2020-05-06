@@ -10,7 +10,16 @@
 'use strict';
 
 import * as React from 'react';
-import {Image, StyleSheet, Text, View, SafeAreaView} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 
 import ViewPager from '@react-native-community/viewpager';
 import {PAGES, createPage} from './utils';
@@ -37,6 +46,10 @@ type State = {
   scrollState: PageScrollState,
   dotsVisible: boolean,
 };
+
+const people = new Array(10)
+  .fill()
+  .map((value, index) => ({firstName: 'John', lastName: 'Doe', id: index}));
 
 export default class ViewPagerExample extends React.Component<*, State> {
   viewPager: React.Ref<typeof ViewPager>;
@@ -109,12 +122,54 @@ export default class ViewPagerExample extends React.Component<*, State> {
 
   renderPage(page: CreatePage) {
     return (
-      <View key={page.key} style={page.style} collapsable={false}>
-        {/* $FlowFixMe */}
-        <Image style={styles.image} source={page.imgSource} />
-        <LikeCount />
-      </View>
+      <FlatList
+        key={page.key}
+        data={people}
+        renderItem={({item}) => (
+          <TouchableOpacity
+            style={{backgroundColor: 'brown', padding: 30}}
+            onPress={() => {
+              console.warn(item.id);
+            }}>
+            <Text>{item.firstName}</Text>
+            <Text>{item.lastName}</Text>
+            <Text>{item.id}</Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={item => '' + item.id}
+      />
     );
+    // return (
+    //   <ScrollView
+    //     key={page.key}
+    //     style={{backgroundColor: 'red'}}
+    //     collapsable={false}>
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //     <LikeCount />
+    //   </ScrollView>
+    // );
   }
 
   toggleDotsVisibility = () => {
@@ -132,7 +187,9 @@ export default class ViewPagerExample extends React.Component<*, State> {
           onPageScroll={this.onPageScroll}
           onPageSelected={this.onPageSelected}
           onPageScrollStateChanged={this.onPageScrollStateChanged}
-          pageMargin={10}
+          onMoveShouldSetResponderCapture={() => {
+            return true;
+          }}
           // Lib does not support dynamically orientation change
           orientation="horizontal"
           // Lib does not support dynamically transitionStyle change
