@@ -30,9 +30,15 @@ export class ProgressBar extends React.Component<Props> {
         (fractionalPosition / (this.props.numberOfPages - 1)) * this.props.size;
     }
 
+    console.log(progressBarSize);
     return (
       <View style={[styles.progressBarContainer, {width: this.props.size}]}>
-        <View style={[styles.progressBar, {width: progressBarSize}]} />
+        <View
+          style={[
+            styles.progressBar,
+            {width: isNaN(progressBarSize) ? 0 : progressBarSize},
+          ]}
+        />
       </View>
     );
   }
@@ -41,13 +47,13 @@ export class ProgressBar extends React.Component<Props> {
 const styles = StyleSheet.create({
   progressBarContainer: {
     height: 10,
-    margin: 10,
-    borderColor: '#eeeeee',
+
+    borderColor: 'red',
     borderWidth: 2,
   },
   progressBar: {
     alignSelf: 'flex-start',
     flex: 1,
-    backgroundColor: '#eeeeee',
+    backgroundColor: 'red',
   },
 });
