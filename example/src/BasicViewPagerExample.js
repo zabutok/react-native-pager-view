@@ -13,17 +13,18 @@ import * as React from 'react';
 import {Image, StyleSheet, Text, View, SafeAreaView} from 'react-native';
 
 import ViewPager from '@react-native-community/viewpager';
-import {PAGES, createPage} from './utils';
-import {Button} from './src/component/Button';
-import {LikeCount} from './src/component/LikeCount';
-import {ProgressBar} from './src/component/ProgressBar';
-import type {CreatePage} from './utils';
+import type {CreatePage} from '../utils';
+import {PAGES, createPage} from '../utils';
+import {Button} from './component/Button';
+import {LikeCount} from './component/LikeCount';
+import {ProgressBar} from './component/ProgressBar';
+
 import type {
   PageScrollEvent,
   PageScrollState,
   PageScrollStateChangedEvent,
   PageSelectedEvent,
-} from '../js';
+} from '../../js';
 
 type State = {
   page: number,
@@ -38,7 +39,7 @@ type State = {
   dotsVisible: boolean,
 };
 
-export default class ViewPagerExample extends React.Component<*, State> {
+export default class BasicViewPagerExample extends React.Component<*, State> {
   viewPager: React.Ref<typeof ViewPager>;
 
   constructor(props: any) {
