@@ -17,7 +17,9 @@ const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 const OnPageScrollExample = () => {
   const [text, setText] = useState(0);
   const [pages, setPages] = useState(
-    Array.from(Array(PAGES)).map((_, index) => createPage(index)),
+    Array(PAGES)
+      .fill(1)
+      .map((_, index) => createPage(index)),
   );
   const scrollOffset = useRef(new Animated.Value(0)).current;
   const position = useRef(new Animated.Value(0)).current;
@@ -26,7 +28,10 @@ const OnPageScrollExample = () => {
 
   return (
     <SafeAreaView style={styles.flex}>
-      <Text>{text}</Text>
+      <View style={styles.textContainer}>
+        <Text>{`Animated value: ${text}`}</Text>
+      </View>
+
       <AnimatedViewPager
         style={styles.flex}
         initialPage={0}
@@ -41,7 +46,7 @@ const OnPageScrollExample = () => {
         )}>
         {pages.map(({key, style}) => (
           <View key={key} style={style}>
-            <Text style={styles.text}>{key}</Text>
+            <Text style={styles.text}>{`Page Index: ${key}`}</Text>
           </View>
         ))}
       </AnimatedViewPager>
@@ -50,7 +55,15 @@ const OnPageScrollExample = () => {
 };
 
 const styles = StyleSheet.create({
-  flex: {flex: 1},
-  text: {fontSize: 30},
+  flex: {
+    flex: 1,
+  },
+  textContainer: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  text: {
+    fontSize: 30,
+  },
 });
 export default OnPageScrollExample;

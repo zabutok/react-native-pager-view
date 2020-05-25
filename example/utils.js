@@ -17,6 +17,9 @@ export const IMAGE_URIS = [
   'https://apod.nasa.gov/apod/image/1510/lunareclipse_27Sep_beletskycrop4.jpg',
 ];
 export const thumbsUp = '\uD83D\uDC4D';
+export const logoUrl =
+  'https://raw.githubusercontent.com/react-native-community/react-native-viewpager/master/docs/viewpager-logo.png';
+
 import type {ViewStyleProp} from 'react-native/Libraries/StyleSheet/StyleSheet';
 
 export type CreatePage = {
