@@ -3,15 +3,12 @@
  */
 
 import * as React from 'react';
-import {useEffect} from 'react';
 import {useState, useRef} from 'react';
 
 import {StyleSheet, Text, View, SafeAreaView, Animated} from 'react-native';
 
-import type {CreatePage} from '../utils';
 import {PAGES, createPage} from '../utils';
 import ViewPager from '@react-native-community/viewpager';
-import {ProgressBar} from './component/ProgressBar';
 
 const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 

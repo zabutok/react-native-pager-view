@@ -3,22 +3,12 @@
  */
 
 import * as React from 'react';
-import {useEffect} from 'react';
-import {useState, useRef} from 'react';
+import {useState} from 'react';
 
-import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  Animated,
-  Alert,
-} from 'react-native';
+import {StyleSheet, Text, View, SafeAreaView, Alert} from 'react-native';
 
-import type {CreatePage} from '../utils';
 import {PAGES, createPage} from '../utils';
 import ViewPager from '@react-native-community/viewpager';
-import {ProgressBar} from './component/ProgressBar';
 
 const OnPageSelectedExample = () => {
   const [pages] = useState(
@@ -59,4 +49,5 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
 });
+
 export default OnPageSelectedExample;

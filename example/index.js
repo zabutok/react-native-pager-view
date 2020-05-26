@@ -17,6 +17,8 @@ import BasicViewPagerExample from './src/BasicViewPagerExample';
 import OnPageScrollExample from './src/OnPageScrollExample';
 import KeyboardExample from './src/KeyboardExample';
 import OnPageSelectedExample from './src/OnPageSelectedExample';
+import ScrollableViewPagerExample from './src/ScrollableViewPagerExample';
+
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -25,6 +27,10 @@ const examples = [
   {component: KeyboardExample, name: 'Keyboard Example'},
   {component: OnPageScrollExample, name: 'OnPageScroll Example'},
   {component: OnPageSelectedExample, name: 'OnPageSelected Example'},
+  {
+    component: ScrollableViewPagerExample,
+    name: 'Scrollable ViewPager Example',
+  },
 ];
 
 function App(props) {
