@@ -11,12 +11,13 @@ import {StyleSheet, Text, View, SafeAreaView, Animated} from 'react-native';
 import type {CreatePage} from '../utils';
 import {PAGES, createPage} from '../utils';
 import ViewPager from '@react-native-community/viewpager';
+import {ProgressBar} from './component/ProgressBar';
 
 const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 
 const OnPageScrollExample = () => {
   const [text, setText] = useState(0);
-  const [pages, setPages] = useState(
+  const [pages] = useState(
     Array(PAGES)
       .fill(1)
       .map((_, index) => createPage(index)),
@@ -24,14 +25,11 @@ const OnPageScrollExample = () => {
   const scrollOffset = useRef(new Animated.Value(0)).current;
   const position = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {}, []);
-
   return (
     <SafeAreaView style={styles.flex}>
-      <View style={styles.textContainer}>
+      <View style={styles.center}>
         <Text>{`Animated value: ${text}`}</Text>
       </View>
-
       <AnimatedViewPager
         style={styles.flex}
         initialPage={0}
@@ -45,7 +43,7 @@ const OnPageScrollExample = () => {
           },
         )}>
         {pages.map(({key, style}) => (
-          <View key={key} style={style}>
+          <View key={key} style={[style, styles.center]}>
             <Text style={styles.text}>{`Page Index: ${key}`}</Text>
           </View>
         ))}
@@ -58,8 +56,10 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
-  textContainer: {
+  center: {
+    justifyContent: 'center',
     alignItems: 'center',
+    alignContent: 'center',
     padding: 20,
   },
   text: {

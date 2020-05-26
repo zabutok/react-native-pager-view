@@ -16,13 +16,15 @@ import {name as appName} from './app.json';
 import BasicViewPagerExample from './src/BasicViewPagerExample';
 import OnPageScrollExample from './src/OnPageScrollExample';
 import KeyboardExample from './src/KeyboardExample';
+import OnPageSelectedExample from './src/OnPageSelectedExample';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
 const examples = [
   {component: BasicViewPagerExample, name: 'Basic Example'},
   {component: KeyboardExample, name: 'Keyboard Example'},
-  {component: OnPageScrollExample, name: 'OnPageScrollExample'},
+  {component: OnPageScrollExample, name: 'OnPageScroll Example'},
+  {component: OnPageSelectedExample, name: 'OnPageSelected Example'},
 ];
 
 function App(props) {
