@@ -18,6 +18,7 @@ import OnPageScrollExample from './src/OnPageScrollExample';
 import KeyboardExample from './src/KeyboardExample';
 import OnPageSelectedExample from './src/OnPageSelectedExample';
 import ScrollableViewPagerExample from './src/ScrollableViewPagerExample';
+import ScrollViewInsideExample from './src/ScrollViewInsideExample';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -30,6 +31,10 @@ const examples = [
   {
     component: ScrollableViewPagerExample,
     name: 'Scrollable ViewPager Example',
+  },
+  {
+    component: ScrollViewInsideExample,
+    name: 'ScrollView inside ViewPager Example',
   },
 ];
 
