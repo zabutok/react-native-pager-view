@@ -10,7 +10,14 @@
 'use strict';
 
 import * as React from 'react';
-import {Image, StyleSheet, Text, View, SafeAreaView} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  Button as RNButton,
+} from 'react-native';
 
 import ViewPager from '@react-native-community/viewpager';
 import {PAGES, createPage} from './utils';
@@ -109,10 +116,20 @@ export default class ViewPagerExample extends React.Component<*, State> {
 
   renderPage(page: CreatePage) {
     return (
-      <View key={page.key} style={page.style} collapsable={false}>
-        {/* $FlowFixMe */}
-        <Image style={styles.image} source={page.imgSource} />
-        <LikeCount />
+      <View
+        key={page.key}
+        style={[page.style, {width: '100%', height: '100%'}]}>
+        {Array(20)
+          .fill(1)
+          .map((item, index) => (
+            <RNButton
+              key={`${index}-aaaa`}
+              title="CLICK ME"
+              onPress={() => {
+                console.log('CLICKED');
+              }}
+            />
+          ))}
       </View>
     );
   }

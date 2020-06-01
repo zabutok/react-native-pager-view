@@ -162,13 +162,6 @@ class ViewPager extends React.Component<ViewPagerProps> {
     );
   };
 
-  _onMoveShouldSetResponderCapture = () => {
-    if (Platform.OS === 'ios') {
-      return this.isScrolling;
-    }
-    return false;
-  };
-
   render() {
     return (
       <NativeViewPager
@@ -178,8 +171,6 @@ class ViewPager extends React.Component<ViewPagerProps> {
         onPageScroll={this._onPageScroll}
         onPageScrollStateChanged={this._onPageScrollStateChanged}
         onPageSelected={this._onPageSelected}
-        onMoveShouldSetResponderCapture={this._onMoveShouldSetResponderCapture}
-        children={childrenWithOverriddenStyle(this.props.children)}
       />
     );
   }

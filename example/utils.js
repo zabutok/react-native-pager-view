@@ -30,8 +30,6 @@ export const createPage = (key: number): CreatePage => {
     key: key,
     style: {
       backgroundColor: BGCOLOR[key % BGCOLOR.length],
-      alignItems: 'center',
-      padding: 20,
     },
     imgSource: {uri: IMAGE_URIS[key % BGCOLOR.length]},
   };
