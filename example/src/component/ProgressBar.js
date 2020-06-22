@@ -41,13 +41,13 @@ export class ProgressBar extends React.Component<Props> {
 const styles = StyleSheet.create({
   progressBarContainer: {
     height: 10,
-    margin: 10,
-    borderColor: '#eeeeee',
+
+    borderColor: 'red',
     borderWidth: 2,
   },
   progressBar: {
     alignSelf: 'flex-start',
     flex: 1,
-    backgroundColor: '#eeeeee',
+    backgroundColor: 'red',
   },
 });
