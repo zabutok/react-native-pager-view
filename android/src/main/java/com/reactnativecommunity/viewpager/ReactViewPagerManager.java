@@ -39,6 +39,7 @@ import static com.reactnative.community.viewpager2.widget.ViewPager2.ORIENTATION
 import static com.reactnative.community.viewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING;
 import static com.reactnative.community.viewpager2.widget.ViewPager2.SCROLL_STATE_IDLE;
 import static com.reactnative.community.viewpager2.widget.ViewPager2.SCROLL_STATE_SETTLING;
+import static com.reactnativecommunity.viewpager.ViewPagerFragment.CHILD_VIEW_KEY;
 
 public class ReactViewPagerManager extends ViewGroupManager<ViewPager2> {
 
@@ -107,7 +108,7 @@ public class ReactViewPagerManager extends ViewGroupManager<ViewPager2> {
             return;
         }
         reactChildrenViews.put(child.getId(), child);
-        Log.d("TAG", "addView: " + String.valueOf(reactChildrenViews));
+        Log.d("TAG", "addView: " + String.valueOf(child.getId()));
         ((FragmentAdapter) parent.getAdapter()).addFragment(child, index);
     }
 
@@ -133,21 +134,21 @@ public class ReactViewPagerManager extends ViewGroupManager<ViewPager2> {
         Log.d("TAG", "removeAllViews: ");
         FragmentAdapter adapter = ((FragmentAdapter) parent.getAdapter());
         for (Fragment fragment : adapter.getChildren()) {
-            if (fragment.getView() != null) {
-                reactChildrenViews.remove(fragment.getView().getId());
-            }
+            int viewID = fragment.getArguments().getInt(CHILD_VIEW_KEY);
+            reactChildrenViews.remove(viewID);
         }
+        adapter.removeAll();
         parent.setAdapter(null);
     }
 
     @Override
     public void removeViewAt(ViewPager2 parent, int index) {
-        //Below line will remove wrong view
-//        reactChildrenViews.removeAt(index);
         FragmentAdapter adapter = ((FragmentAdapter) parent.getAdapter());
-        View viewToRemove = adapter.getChildAt(index);
-        reactChildrenViews.remove(viewToRemove.getId());
-        ((FragmentAdapter) parent.getAdapter()).removeFragment(viewToRemove);
+        Fragment fragment = adapter.getChildren().get(index);
+        if (fragment.getView() != null) {
+            reactChildrenViews.remove(fragment.getView().getId());
+        }
+        ((FragmentAdapter) parent.getAdapter()).removeFragmentAt(index);
     }
 
     @Override
