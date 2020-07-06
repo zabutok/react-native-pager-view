@@ -22,61 +22,36 @@ import ScrollViewInsideExample from './src/ScrollViewInsideExample';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-
-const examples = [
-  {component: BasicViewPagerExample, name: 'Basic Example'},
-  {component: KeyboardExample, name: 'Keyboard Example'},
-  {component: OnPageScrollExample, name: 'OnPageScroll Example'},
-  {component: OnPageSelectedExample, name: 'OnPageSelected Example'},
-  {
-    component: ScrollableViewPagerExample,
-    name: 'Scrollable ViewPager Example',
-  },
-  {
-    component: ScrollViewInsideExample,
-    name: 'ScrollView inside ViewPager Example',
-  },
-];
-
-function App(props) {
-  return (
-    <ScrollView>
-      {examples.map(example => (
-        <TouchableOpacity
-          key={example.name}
-          style={styles.exampleTouchable}
-          onPress={() => {
-            props.navigation.push(example.name);
-          }}>
-          <Text style={styles.exampleText}>{example.name}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  );
-}
+import ViewPager from '@react-native-community/viewpager';
+import {View} from 'react-native';
 
 const Stack = createStackNavigator();
+
+const ViewPagerScreen = ({navigation}) => {
+  return (
+    <ViewPager style={{flex: 1}} initialPage={0}>
+      <View key={1} style={{backgroundColor: '#aaccaa'}}>
+        <Text>First page</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('NestedStack')}>
+          <Text>Goto NestedStack</Text>
+        </TouchableOpacity>
+      </View>
+      <View key={2} style={{backgroundColor: '#aaaacc'}}>
+        <Text>Second page</Text>
+      </View>
+    </ViewPager>
+  );
+};
 
 function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="ViewPager Example">
-        <Stack.Screen name="ViewPager Example" component={App} />
-        {examples.map(example => (
-          <Stack.Screen name={example.name} component={example.component} />
-        ))}
+        <Stack.Screen name="ViewPager Example" component={ViewPagerScreen} />
+        <Stack.Screen name="NestedStack" component={ViewPagerScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  exampleTouchable: {
-    padding: 16,
-  },
-  exampleText: {
-    fontSize: 16,
-  },
-});
 
 AppRegistry.registerComponent(appName, () => Navigation);
