@@ -7,12 +7,14 @@
 
 package com.reactnativecommunity.viewpager;
 
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 
@@ -105,6 +107,7 @@ public class ReactViewPagerManager extends ViewGroupManager<ViewPager2> {
             return;
         }
         reactChildrenViews.put(child.getId(), child);
+        Log.d("TAG", "addView: " + String.valueOf(reactChildrenViews));
         ((FragmentAdapter) parent.getAdapter()).addFragment(child, index);
     }
 
@@ -126,9 +129,25 @@ public class ReactViewPagerManager extends ViewGroupManager<ViewPager2> {
     }
 
     @Override
+    public void removeAllViews(ViewPager2 parent) {
+        Log.d("TAG", "removeAllViews: ");
+        FragmentAdapter adapter = ((FragmentAdapter) parent.getAdapter());
+        for (Fragment fragment : adapter.getChildren()) {
+            if (fragment.getView() != null) {
+                reactChildrenViews.remove(fragment.getView().getId());
+            }
+        }
+        parent.setAdapter(null);
+    }
+
+    @Override
     public void removeViewAt(ViewPager2 parent, int index) {
-        reactChildrenViews.removeAt(index);
-        ((FragmentAdapter) parent.getAdapter()).removeFragmentAt(index);
+        //Below line will remove wrong view
+//        reactChildrenViews.removeAt(index);
+        FragmentAdapter adapter = ((FragmentAdapter) parent.getAdapter());
+        View viewToRemove = adapter.getChildAt(index);
+        reactChildrenViews.remove(viewToRemove.getId());
+        ((FragmentAdapter) parent.getAdapter()).removeFragment(viewToRemove);
     }
 
     @Override
