@@ -52,6 +52,16 @@ public class FragmentAdapter extends FragmentStateAdapter {
         notifyItemRemoved(index);
     }
 
+
+    public void removeAll() {
+        children.clear();
+        notifyDataSetChanged();
+    }
+
+    public ArrayList<ViewPagerFragment> getChildren() {
+        return children;
+    }
+    
     public View getChildAt(int index) {
         return children.get(index).getView();
     }
