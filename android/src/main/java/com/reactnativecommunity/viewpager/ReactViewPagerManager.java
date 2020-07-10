@@ -142,10 +142,9 @@ public class ReactViewPagerManager extends ViewGroupManager<ViewPager2> {
     public void removeViewAt(ViewPager2 parent, int index) {
         FragmentAdapter adapter = ((FragmentAdapter) parent.getAdapter());
         Fragment fragment = adapter.getChildren().get(index);
-        if (fragment.getView() != null) {
-            reactChildrenViews.remove(fragment.getView().getId());
-        }
-        ((FragmentAdapter) parent.getAdapter()).removeFragmentAt(index);
+        int viewID = fragment.getArguments().getInt(CHILD_VIEW_KEY);
+        reactChildrenViews.remove(viewID);
+        adapter.removeFragmentAt(index);
     }
 
     @Override
