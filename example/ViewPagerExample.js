@@ -38,181 +38,43 @@ type State = {
   dotsVisible: boolean,
 };
 
-export default class ViewPagerExample extends React.Component<*, State> {
-  viewPager: React.Ref<typeof ViewPager>;
+export default function ViewPagerExample() {
+  const [items, setItems] = React.useState<string[]>([]);
 
-  constructor(props: any) {
-    super(props);
+  React.useEffect(() => {
+    setTimeout(() => {
+      setItems(['one', 'two', 'three']);
+    }, 1000);
+  }, [setItems]);
 
-    const pages = [];
-    for (let i = 0; i < PAGES; i++) {
-      pages.push(createPage(i));
-    }
-
-    this.state = {
-      page: 0,
-      animationsAreEnabled: true,
-      scrollEnabled: true,
-      progress: {
-        position: 0,
-        offset: 0,
-      },
-      pages: pages,
-      scrollState: 'idle',
-      dotsVisible: false,
-    };
-    this.viewPager = React.createRef();
-  }
-
-  onPageSelected = (e: PageSelectedEvent) => {
-    this.setState({page: e.nativeEvent.position});
-  };
-
-  onPageScroll = (e: PageScrollEvent) => {
-    this.setState({
-      progress: {
-        position: e.nativeEvent.position,
-        offset: e.nativeEvent.offset,
-      },
-    });
-  };
-
-  onPageScrollStateChanged = (e: PageScrollStateChangedEvent) => {
-    this.setState({scrollState: e.nativeEvent.pageScrollState});
-  };
-
-  addPage = () => {
-    this.setState((prevState) => ({
-      pages: [...prevState.pages, createPage(prevState.pages.length)],
-    }));
-  };
-
-  removeLastPage = () => {
-    this.setState((prevState) => ({
-      pages: prevState.pages.slice(0, prevState.pages.length - 1),
-    }));
-  };
-  move = (delta: number) => {
-    const page = this.state.page + delta;
-    this.go(page);
-  };
-
-  go = (page: number) => {
-    if (this.state.animationsAreEnabled) {
-      /* $FlowFixMe we need to update flow to support React.Ref and createRef() */
-      this.viewPager.current.setPage(page);
-    } else {
-      /* $FlowFixMe we need to update flow to support React.Ref and createRef() */
-      this.viewPager.current.setPageWithoutAnimation(page);
-    }
-  };
-
-  renderPage(page: CreatePage) {
+  function renderPage(item) {
     return (
-      <View key={page.key} style={page.style} collapsable={false}>
-        {/* $FlowFixMe */}
-        <Image style={styles.image} source={page.imgSource} />
-        <LikeCount />
+      <View
+        key={item}
+        style={{backgroundColor: 'red', width: '100%', height: '100%'}}
+        collapsable={false}>
+        <View style={{flex: 1}}>
+          <Text>Item: {item}</Text>
+        </View>
       </View>
     );
   }
 
-  toggleDotsVisibility = () => {
-    this.setState((prevState) => ({dotsVisible: !prevState.dotsVisible}));
-  };
+  return (
+    <ViewPager
+      style={{width: '100%', height: 50, backgroundColor: '#ddd'}}
+      initialPage={0}>
+      {/*<View key="-1">*/}
+      {/*    <Text>A static item which is always rendered. Adding it will also prevent the bug. </Text>*/}
+      {/*</View>*/}
 
-  render() {
-    const {page, pages, animationsAreEnabled, dotsVisible} = this.state;
-    return (
-      <SafeAreaView style={styles.container}>
-        <ViewPager
-          style={styles.viewPager}
-          initialPage={0}
-          scrollEnabled={this.state.scrollEnabled}
-          onPageScroll={this.onPageScroll}
-          onPageSelected={this.onPageSelected}
-          onPageScrollStateChanged={this.onPageScrollStateChanged}
-          pageMargin={10}
-          // Lib does not support dynamically orientation change
-          orientation="horizontal"
-          // Lib does not support dynamically transitionStyle change
-          transitionStyle="scroll"
-          showPageIndicator={dotsVisible}
-          ref={this.viewPager}>
-          {pages.map((p) => this.renderPage(p))}
-        </ViewPager>
-        <View style={styles.buttons}>
-          <Button
-            enabled={true}
-            text={
-              this.state.scrollEnabled ? 'Scroll Enabled' : 'Scroll Disabled'
-            }
-            onPress={() =>
-              this.setState({scrollEnabled: !this.state.scrollEnabled})
-            }
-          />
-          <Button
-            enabled={true}
-            text={dotsVisible ? 'Hide dots' : 'Show dots'}
-            onPress={this.toggleDotsVisibility}
-          />
-          <Button enabled={true} text="Add new page" onPress={this.addPage} />
-          <Button
-            enabled={true}
-            text="Remove last page"
-            onPress={this.removeLastPage}
-          />
+      {items.map((item, index) => (
+        <View key={index}>
+          <Text>Item: {item}</Text>
         </View>
-        <View style={styles.buttons}>
-          {animationsAreEnabled ? (
-            <Button
-              text="Turn off animations"
-              enabled={true}
-              onPress={() => this.setState({animationsAreEnabled: false})}
-            />
-          ) : (
-            <Button
-              text="Turn animations back on"
-              enabled={true}
-              onPress={() => this.setState({animationsAreEnabled: true})}
-            />
-          )}
-          <Text style={styles.scrollStateText}>
-            ScrollState[ {this.state.scrollState} ]
-          </Text>
-        </View>
-        <View style={styles.buttons}>
-          <Button text="Start" enabled={page > 0} onPress={() => this.go(0)} />
-          <Button
-            text="Prev"
-            enabled={page > 0}
-            onPress={() => this.move(-1)}
-          />
-          <Button
-            text="Next"
-            enabled={page < pages.length - 1}
-            onPress={() => this.move(1)}
-          />
-          <Button
-            text="Last"
-            enabled={page < pages.length - 1}
-            onPress={() => this.go(pages.length - 1)}
-          />
-        </View>
-        <View style={styles.progress}>
-          <Text style={styles.buttonText}>
-            {' '}
-            Page {page + 1} / {pages.length}{' '}
-          </Text>
-          <ProgressBar
-            numberOfPages={pages.length}
-            size={300}
-            progress={this.state.progress}
-          />
-        </View>
-      </SafeAreaView>
-    );
-  }
+      ))}
+    </ViewPager>
+  );
 }
 
 const styles = StyleSheet.create({
