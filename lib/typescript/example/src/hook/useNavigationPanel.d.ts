@@ -2,7 +2,12 @@
 import type { default as ViewPager, ViewPagerOnPageSelectedEvent, ViewPagerOnPageScrollEvent, PageScrollStateChangedNativeEvent } from '@react-native-community/viewpager';
 import { CreatePage } from '../utils';
 export declare type UseNavigationPanelProps = ReturnType<typeof useNavigationPanel>;
-export declare function useNavigationPanel(): {
+export interface EventLog {
+    event: 'scroll' | 'select' | 'statusChanged';
+    text: string;
+    timestamp: Date;
+}
+export declare function useNavigationPanel(pagesAmount?: number): {
     ref: import("react").RefObject<ViewPager>;
     activePage: number;
     isAnimated: boolean;
@@ -27,4 +32,5 @@ export declare function useNavigationPanel(): {
     onPageScroll: (e: ViewPagerOnPageScrollEvent) => void;
     onPageSelected: (e: ViewPagerOnPageSelectedEvent) => void;
     onPageScrollStateChanged: (e: PageScrollStateChangedNativeEvent) => void;
+    logs: EventLog[];
 };

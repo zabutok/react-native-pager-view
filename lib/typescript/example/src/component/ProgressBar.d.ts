@@ -13,7 +13,6 @@ declare type Props = {
         offset: number;
     };
     numberOfPages: number;
-    size: number;
 };
 export declare class ProgressBar extends React.Component<Props> {
     render(): JSX.Element;
