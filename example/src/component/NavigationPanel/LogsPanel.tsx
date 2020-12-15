@@ -11,8 +11,14 @@ export function LogsPanel({ logs }: LogsPanelProps) {
       keyExtractor={({ timestamp }) => `${timestamp.getTime()}`}
       data={logs}
       renderItem={({ item }) => (
-        <View style={styles[item.event]}>
-          <Text style={styles.text}>{item.timestamp.toLocaleTimeString()}</Text>
+        <View style={[styles.item, styles[item.event]]}>
+          <Text style={styles.text}>
+            {item.timestamp.toLocaleTimeString()}
+            <Text style={styles.eventName}>
+              {' | '}
+              {item.event.toLocaleUpperCase()}
+            </Text>
+          </Text>
           <Text style={styles.text}>{item.text}</Text>
         </View>
       )}
@@ -25,6 +31,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     height: 250,
   },
+  item: {
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+  },
   scroll: {
     backgroundColor: 'cyan',
   },
@@ -36,5 +46,8 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#000',
+  },
+  eventName: {
+    color: '#595959',
   },
 });
