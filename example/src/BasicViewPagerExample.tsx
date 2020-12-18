@@ -1,16 +1,5 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @flow
- */
-
-'use strict';
-
 import React, { useMemo } from 'react';
-import { Image, StyleSheet, View, SafeAreaView } from 'react-native';
+import { Image, StyleSheet, View, SafeAreaView, Animated } from 'react-native';
 
 import ViewPager from '@react-native-community/viewpager';
 
@@ -18,12 +7,14 @@ import { LikeCount } from './component/LikeCount';
 import { NavigationPanel } from './component/NavigationPanel';
 import { useNavigationPanel } from './hook/useNavigationPanel';
 
+const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
+
 export function BasicViewPagerExample() {
   const { ref, ...navigationPanel } = useNavigationPanel();
 
   return (
     <SafeAreaView style={styles.container}>
-      <ViewPager
+      <AnimatedViewPager
         ref={ref}
         style={styles.viewPager}
         initialPage={0}
@@ -48,7 +39,7 @@ export function BasicViewPagerExample() {
             )),
           [navigationPanel.pages]
         )}
-      </ViewPager>
+      </AnimatedViewPager>
       <NavigationPanel {...navigationPanel} />
     </SafeAreaView>
   );

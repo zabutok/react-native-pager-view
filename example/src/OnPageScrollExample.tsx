@@ -1,8 +1,6 @@
-import React, { useRef, useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, SafeAreaView, Animated } from 'react-native';
-import ViewPager, {
-  ViewPagerOnPageScrollEvent,
-} from '@react-native-community/viewpager';
+import ViewPager from '@react-native-community/viewpager';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { ProgressBar } from './component/ProgressBar';
 import { useNavigationPanel } from './hook/useNavigationPanel';
@@ -11,26 +9,8 @@ import { NavigationPanel } from './component/NavigationPanel';
 const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 
 export function OnPageScrollExample() {
-  const { ref, ...navigationPanel } = useNavigationPanel();
-  const {
-    activePage,
-    onPageScroll,
-    setPage,
-    progress,
-    pages,
-  } = navigationPanel;
-  const scrollOffset = useRef(new Animated.Value(0)).current;
-  const position = useRef(new Animated.Value(0)).current;
-  const animatedEvent = useMemo(
-    () =>
-      Animated.event([{ nativeEvent: { offset: scrollOffset, position } }], {
-        listener: (event: ViewPagerOnPageScrollEvent) => {
-          onPageScroll(event);
-        },
-        useNativeDriver: true,
-      }),
-    [onPageScroll, position, scrollOffset]
-  );
+  const { ref, ...navigationPanel } = useNavigationPanel(5);
+  const { activePage, setPage, progress, pages } = navigationPanel;
 
   return (
     <SafeAreaView style={styles.flex}>
@@ -52,13 +32,12 @@ export function OnPageScrollExample() {
           ))}
         </ScrollView>
       </View>
-      <ProgressBar numberOfPages={pages.length} progress={progress} />
+
       <AnimatedViewPager
         {...navigationPanel}
         ref={ref}
-        style={styles.flex}
+        style={styles.viewpager}
         initialPage={0}
-        onPageScroll={animatedEvent}
       >
         {navigationPanel.pages.map(({ key, style }) => (
           <View key={key} style={[style, styles.center]}>
@@ -66,6 +45,10 @@ export function OnPageScrollExample() {
           </View>
         ))}
       </AnimatedViewPager>
+      <View style={styles.progressContainer}>
+        <ProgressBar numberOfPages={pages.length} progress={progress} />
+      </View>
+
       <NavigationPanel {...navigationPanel} disablePagesAmountManagement />
     </SafeAreaView>
   );
@@ -75,10 +58,14 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  viewpager: {
+    flex: 1,
+  },
   container: {
     flexDirection: 'row',
     backgroundColor: '#63a4ff',
   },
+  progressContainer: { flex: 0.1, backgroundColor: '#63a4ff' },
   center: {
     justifyContent: 'center',
     alignItems: 'center',

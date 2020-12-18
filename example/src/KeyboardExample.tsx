@@ -1,9 +1,3 @@
-/**
- *
- * @format
- * @flow strict-local
- */
-
 import React, { useCallback } from 'react';
 import {
   SafeAreaView,
@@ -13,11 +7,13 @@ import {
   Text,
   Image,
   TextInput,
+  Button,
+  Animated,
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import ViewPager from '@react-native-community/viewpager';
 import { logoUrl } from './utils';
-import { Button } from './component/Button';
+
 import { NavigationPanel } from './component/NavigationPanel';
 import { useNavigationPanel } from './hook/useNavigationPanel';
 
@@ -33,10 +29,12 @@ const Page = ({ title, description, onPress, buttonTitle }: PageProps) => {
       <Text style={styles.sectionTitle}>{title}</Text>
       <Text style={styles.sectionDescription}>{description}</Text>
       <TextInput style={styles.textInput} />
-      <Button onPress={onPress} text={buttonTitle} />
+      <Button onPress={onPress} title={buttonTitle} />
     </>
   );
 };
+
+const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 
 export function KeyboardExample() {
   const { ref, ...navigationPanel } = useNavigationPanel(2);
@@ -53,7 +51,7 @@ export function KeyboardExample() {
           />
         </View>
         <View style={styles.flex}>
-          <ViewPager
+          <AnimatedViewPager
             {...navigationPanel}
             ref={ref}
             style={styles.flex}
@@ -76,7 +74,7 @@ export function KeyboardExample() {
                 buttonTitle="Go to previous question"
               />
             </View>
-          </ViewPager>
+          </AnimatedViewPager>
         </View>
       </ScrollView>
       <NavigationPanel

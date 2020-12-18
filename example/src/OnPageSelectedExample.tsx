@@ -1,41 +1,40 @@
-/**
- * @flow
- */
-
 import * as React from 'react';
 
-import { StyleSheet, Text, View, SafeAreaView, Alert } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  Alert,
+  Animated,
+} from 'react-native';
 
-import ViewPager, {
-  ViewPagerOnPageSelectedEvent,
-} from '@react-native-community/viewpager';
+import ViewPager from '@react-native-community/viewpager';
 import { NavigationPanel } from './component/NavigationPanel';
 import { useNavigationPanel } from './hook/useNavigationPanel';
 
+const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
+
 export const OnPageSelectedExample = () => {
-  const { ref, ...navigationPanel } = useNavigationPanel();
+  const callback = React.useCallback((position: number) => {
+    Alert.alert('Hey', `You are on ${position + 1} page`);
+  }, []);
+  const { ref, ...navigationPanel } = useNavigationPanel(10, callback);
 
   return (
     <SafeAreaView style={styles.flex}>
-      <ViewPager
+      <AnimatedViewPager
         {...navigationPanel}
         ref={ref}
         style={styles.flex}
         initialPage={0}
-        onPageSelected={(event: ViewPagerOnPageSelectedEvent) => {
-          navigationPanel.onPageSelected(event);
-          Alert.alert(
-            'Hey',
-            `You are on ${event.nativeEvent.position + 1} page`
-          );
-        }}
       >
         {navigationPanel.pages.map(({ key, style }) => (
           <View key={key} style={[style, styles.center]}>
             <Text style={styles.text}>{`Page Index: ${key}`}</Text>
           </View>
         ))}
-      </ViewPager>
+      </AnimatedViewPager>
       <NavigationPanel {...navigationPanel} />
     </SafeAreaView>
   );

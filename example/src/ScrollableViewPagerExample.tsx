@@ -1,14 +1,12 @@
-/**
- * @flow
- */
-
 import ViewPager from '@react-native-community/viewpager';
 import React from 'react';
-import { ScrollView, View, Image, StyleSheet } from 'react-native';
+import { ScrollView, View, Image, StyleSheet, Animated } from 'react-native';
 import { NavigationPanel } from './component/NavigationPanel';
 import { useNavigationPanel } from './hook/useNavigationPanel';
 
 const HEIGHT = 300;
+
+const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 
 export const ScrollableViewPagerExample = (): JSX.Element => {
   const { ref, ...navigationPanel } = useNavigationPanel();
@@ -17,7 +15,7 @@ export const ScrollableViewPagerExample = (): JSX.Element => {
     <>
       <ScrollView style={styles.flex}>
         {navigationPanel.pages.map(({ key }) => (
-          <ViewPager
+          <AnimatedViewPager
             {...navigationPanel}
             ref={ref}
             key={key}
@@ -28,7 +26,7 @@ export const ScrollableViewPagerExample = (): JSX.Element => {
                 <Image style={styles.flex} source={page.imgSource} />
               </View>
             ))}
-          </ViewPager>
+          </AnimatedViewPager>
         ))}
       </ScrollView>
       <NavigationPanel {...navigationPanel} />

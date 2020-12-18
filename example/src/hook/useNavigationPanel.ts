@@ -1,9 +1,10 @@
 import type {
   default as ViewPager,
-  ViewPagerOnPageSelectedEvent,
-  ViewPagerOnPageScrollEvent,
   PageScrollStateChangedNativeEvent,
+  ViewPagerOnPageScrollEventData,
+  ViewPagerOnPageSelectedEventData,
 } from '@react-native-community/viewpager';
+import { Animated } from 'react-native';
 import { createPage, CreatePage } from '../utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
@@ -18,7 +19,10 @@ export interface EventLog {
 const getBasePages = (pages: number) =>
   new Array(pages).fill('').map((_v, index) => createPage(index));
 
-export function useNavigationPanel(pagesAmount: number = 10) {
+export function useNavigationPanel(
+  pagesAmount: number = 10,
+  onPageSelectedCallback: (position: number) => void = () => {}
+) {
   const ref = useRef<ViewPager>(null);
   const [pages, setPages] = useState<CreatePage[]>(
     useMemo(() => getBasePages(pagesAmount), [pagesAmount])
@@ -30,6 +34,10 @@ export function useNavigationPanel(pagesAmount: number = 10) {
   const [dotsEnabled, setDotsEnabled] = useState(false);
   const [logs, setLogs] = useState<EventLog[]>([]);
   const [progress, setProgress] = useState({ position: 0, offset: 0 });
+  const onPageScrollOffset = useRef(new Animated.Value(0)).current;
+  const onPageScrollPosition = useRef(new Animated.Value(0)).current;
+  const onPageSelectedPosition = useRef(new Animated.Value(0)).current;
+
   const setPage = useCallback(
     (page: number) =>
       isAnimated
@@ -39,7 +47,7 @@ export function useNavigationPanel(pagesAmount: number = 10) {
   );
 
   const addLog = useCallback((log: EventLog) => {
-    setLogs((logs) => [log, ...logs].slice(0, 100));
+    setLogs((text) => [log, ...text].slice(0, 100));
   }, []);
 
   const addPage = useCallback(
@@ -63,31 +71,57 @@ export function useNavigationPanel(pagesAmount: number = 10) {
     []
   );
 
-  const onPageScroll = useCallback(
-    (e: ViewPagerOnPageScrollEvent) => {
-      addLog({
-        event: 'scroll',
-        text: `Position: ${e.nativeEvent.position} Offset: ${e.nativeEvent.offset}`,
-        timestamp: new Date(),
-      });
-      setProgress({
-        position: e.nativeEvent.position,
-        offset: e.nativeEvent.offset,
-      });
-    },
-    [addLog]
+  const onPageScroll = useMemo(
+    () =>
+      Animated.event<ViewPagerOnPageScrollEventData>(
+        [
+          {
+            nativeEvent: {
+              offset: onPageScrollOffset,
+              position: onPageScrollPosition,
+            },
+          },
+        ],
+        {
+          listener: ({ nativeEvent: { offset, position } }) => {
+            addLog({
+              event: 'scroll',
+              text: `Position: ${position} Offset: ${offset}`,
+              timestamp: new Date(),
+            });
+            setProgress({
+              position,
+              offset,
+            });
+          },
+          useNativeDriver: true,
+        }
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
-  const onPageSelected = useCallback(
-    (e: ViewPagerOnPageSelectedEvent) => {
-      addLog({
-        event: 'select',
-        text: `Page: ${e.nativeEvent.position}`,
-        timestamp: new Date(),
-      });
-      setActivePage(e.nativeEvent.position);
-    },
-    [addLog]
+
+  const onPageSelected = useMemo(
+    () =>
+      Animated.event<ViewPagerOnPageSelectedEventData>(
+        [{ nativeEvent: { position: onPageSelectedPosition } }],
+        {
+          listener: ({ nativeEvent: { position } }) => {
+            addLog({
+              event: 'select',
+              text: `Page: ${position}`,
+              timestamp: new Date(),
+            });
+            setActivePage(position);
+            onPageSelectedCallback(position);
+          },
+          useNativeDriver: true,
+        }
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
+
   const onPageScrollStateChanged = useCallback(
     (e: PageScrollStateChangedNativeEvent) => {
       addLog({
@@ -97,7 +131,8 @@ export function useNavigationPanel(pagesAmount: number = 10) {
       });
       setScrollState(e.nativeEvent.pageScrollState);
     },
-    [addLog]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   return {
