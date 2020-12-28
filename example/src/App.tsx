@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { StyleSheet, Text, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { BasicViewPagerExample } from './BasicViewPagerExample';
@@ -8,12 +14,14 @@ import { OnPageScrollExample } from './OnPageScrollExample';
 import { OnPageSelectedExample } from './OnPageSelectedExample';
 import { ScrollableViewPagerExample } from './ScrollableViewPagerExample';
 import { ScrollViewInsideExample } from './ScrollViewInsideExample';
+import HeadphonesCarouselExample from './HeadphonesCarouselExample';
 
 const examples = [
   { component: BasicViewPagerExample, name: 'Basic Example' },
   { component: KeyboardExample, name: 'Keyboard Example' },
   { component: OnPageScrollExample, name: 'OnPageScroll Example' },
   { component: OnPageSelectedExample, name: 'OnPageSelected Example' },
+  { component: HeadphonesCarouselExample, name: 'Headphones Carousel Example' },
   {
     component: ScrollableViewPagerExample,
     name: 'Scrollable ViewPager Example',
