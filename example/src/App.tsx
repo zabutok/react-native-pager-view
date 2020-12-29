@@ -1,11 +1,5 @@
 import * as React from 'react';
-import {
-  StyleSheet,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { StyleSheet, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { BasicViewPagerExample } from './BasicViewPagerExample';

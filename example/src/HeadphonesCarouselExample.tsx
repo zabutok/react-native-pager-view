@@ -3,6 +3,7 @@ Inspiration: https://dribbble.com/shots/3894781-Urbanears-Headphones
 Twitter: http://twitter.com/mironcatalin
 GitHub: http://github.com/catalinmiron
 Video Tutorial: https://youtu.be/cGTD4yYgEHc
+Link to example: https://github.com/catalinmiron/react-native-headphones-carousel
 */
 
 import React from 'react';
@@ -13,6 +14,7 @@ import {
   Image,
   Dimensions,
   Animated,
+  ImageRequireSource,
 } from 'react-native';
 import type { ViewPagerOnPageScrollEventData } from 'src/types';
 import ViewPager from '@react-native-community/viewpager';
@@ -60,19 +62,23 @@ const DOT_SIZE = 40;
 const TICKER_HEIGHT = 40;
 const CIRCLE_SIZE = width * 0.6;
 
-const Circle = ({ onPageScrollOffset }) => {
+const Circle = ({
+  scrollOffsetAnimatedValue,
+}: {
+  scrollOffsetAnimatedValue: Animated.Value;
+}) => {
   return (
     <View style={[StyleSheet.absoluteFillObject, styles.circleContainer]}>
       {data.map(({ color }, index) => {
         const inputRange = [0, 0.5, 0.99];
         const inputRangeOpacity = [0, 0.5, 0.99];
-        const scale = onPageScrollOffset.interpolate({
+        const scale = scrollOffsetAnimatedValue.interpolate({
           inputRange,
           outputRange: [1, 0, 1],
           extrapolate: 'clamp',
         });
 
-        const opacity = onPageScrollOffset.interpolate({
+        const opacity = scrollOffsetAnimatedValue.interpolate({
           inputRange: inputRangeOpacity,
           outputRange: [0.2, 0, 0.2],
         });
@@ -95,11 +101,17 @@ const Circle = ({ onPageScrollOffset }) => {
   );
 };
 
-const Ticker = ({ onPageScrollOffset, onPageScrollPosition }) => {
+const Ticker = ({
+  scrollOffsetAnimatedValue,
+  positionAnimatedValue,
+}: {
+  scrollOffsetAnimatedValue: Animated.Value;
+  positionAnimatedValue: Animated.Value;
+}) => {
   const inputRange = [0, data.length];
   const translateY = Animated.add(
-    onPageScrollOffset,
-    onPageScrollPosition
+    scrollOffsetAnimatedValue,
+    positionAnimatedValue
   ).interpolate({
     inputRange,
     outputRange: [0, data.length * -TICKER_HEIGHT],
@@ -123,18 +135,22 @@ const Item = ({
   imageUri,
   heading,
   description,
-  index,
-  onPageScrollOffset,
-  onPageScrollPosition,
+  scrollOffsetAnimatedValue,
+}: {
+  imageUri: ImageRequireSource;
+  description: string;
+  heading: string;
+  scrollOffsetAnimatedValue: Animated.Value;
+  positionAnimatedValue: Animated.Value;
 }) => {
   const inputRange = [0, 0.5, 0.99];
   const inputRangeOpacity = [0, 0.5, 0.99];
-  const scale = onPageScrollOffset.interpolate({
+  const scale = scrollOffsetAnimatedValue.interpolate({
     inputRange,
     outputRange: [1, 0, 1],
   });
 
-  const opacity = onPageScrollOffset.interpolate({
+  const opacity = scrollOffsetAnimatedValue.interpolate({
     inputRange: inputRangeOpacity,
     outputRange: [1, 0, 1],
   });
@@ -156,7 +172,6 @@ const Item = ({
             styles.heading,
             {
               opacity,
-              // transform: [{ translateX: translateXHeading }],
             },
           ]}
         >
@@ -167,11 +182,6 @@ const Item = ({
             styles.description,
             {
               opacity,
-              // transform: [
-              //   {
-              //     translateX: translateXDescription,
-              //   },
-              // ],
             },
           ]}
         >
@@ -182,11 +192,17 @@ const Item = ({
   );
 };
 
-const Pagination = ({ onPageScrollOffset, onPageScrollPosition }) => {
+const Pagination = ({
+  scrollOffsetAnimatedValue,
+  positionAnimatedValue,
+}: {
+  scrollOffsetAnimatedValue: Animated.Value;
+  positionAnimatedValue: Animated.Value;
+}) => {
   const inputRange = [0, data.length];
   const translateX = Animated.add(
-    onPageScrollOffset,
-    onPageScrollPosition
+    scrollOffsetAnimatedValue,
+    positionAnimatedValue
   ).interpolate({
     inputRange,
     outputRange: [0, data.length * DOT_SIZE],
@@ -219,13 +235,12 @@ const Pagination = ({ onPageScrollOffset, onPageScrollPosition }) => {
 const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 
 export default function HeadphonesCarouselExample() {
-  const scrollX = React.useRef(new Animated.Value(0)).current;
-  const onPageScrollOffset = React.useRef(new Animated.Value(0)).current;
-  const onPageScrollPosition = React.useRef(new Animated.Value(0)).current;
+  const scrollOffsetAnimatedValue = React.useRef(new Animated.Value(0)).current;
+  const positionAnimatedValue = React.useRef(new Animated.Value(0)).current;
 
   return (
     <View style={styles.container}>
-      <Circle onPageScrollOffset={onPageScrollOffset} />
+      <Circle scrollOffsetAnimatedValue={scrollOffsetAnimatedValue} />
       <AnimatedViewPager
         initialPage={0}
         style={{ width: '100%', height: '100%' }}
@@ -233,8 +248,8 @@ export default function HeadphonesCarouselExample() {
           [
             {
               nativeEvent: {
-                offset: onPageScrollOffset,
-                position: onPageScrollPosition,
+                offset: scrollOffsetAnimatedValue,
+                position: positionAnimatedValue,
               },
             },
           ],
@@ -250,9 +265,8 @@ export default function HeadphonesCarouselExample() {
           <View collapsable={false} key={index}>
             <Item
               {...item}
-              index={index}
-              onPageScrollOffset={onPageScrollOffset}
-              onPageScrollPosition={onPageScrollPosition}
+              scrollOffsetAnimatedValue={scrollOffsetAnimatedValue}
+              positionAnimatedValue={positionAnimatedValue}
             />
           </View>
         ))}
@@ -262,12 +276,12 @@ export default function HeadphonesCarouselExample() {
         source={require('../assets/ue_black_logo.png')}
       />
       <Pagination
-        onPageScrollOffset={onPageScrollOffset}
-        onPageScrollPosition={onPageScrollPosition}
+        scrollOffsetAnimatedValue={scrollOffsetAnimatedValue}
+        positionAnimatedValue={positionAnimatedValue}
       />
       <Ticker
-        onPageScrollOffset={onPageScrollOffset}
-        onPageScrollPosition={onPageScrollPosition}
+        scrollOffsetAnimatedValue={scrollOffsetAnimatedValue}
+        positionAnimatedValue={positionAnimatedValue}
       />
     </View>
   );
