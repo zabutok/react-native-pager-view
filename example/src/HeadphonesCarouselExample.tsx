@@ -60,24 +60,23 @@ const DOT_SIZE = 40;
 const TICKER_HEIGHT = 40;
 const CIRCLE_SIZE = width * 0.6;
 
-const Circle = ({ scrollX }) => {
+const Circle = ({ onPageScrollOffset }) => {
   return (
     <View style={[StyleSheet.absoluteFillObject, styles.circleContainer]}>
       {data.map(({ color }, index) => {
-        const inputRange = [
-          (index - 0.55) * width,
-          index * width,
-          (index + 0.55) * width,
-        ];
-        const scale = scrollX.interpolate({
+        const inputRange = [0, 0.5, 0.99];
+        const inputRangeOpacity = [0, 0.5, 0.99];
+        const scale = onPageScrollOffset.interpolate({
           inputRange,
-          outputRange: [0, 1, 0],
+          outputRange: [1, 0, 1],
           extrapolate: 'clamp',
         });
-        const opacity = scrollX.interpolate({
-          inputRange,
-          outputRange: [0, 0.2, 0],
+
+        const opacity = onPageScrollOffset.interpolate({
+          inputRange: inputRangeOpacity,
+          outputRange: [0.2, 0, 0.2],
         });
+
         return (
           <Animated.View
             key={index}
@@ -96,11 +95,14 @@ const Circle = ({ scrollX }) => {
   );
 };
 
-const Ticker = ({ scrollX }) => {
-  const inputRange = [-width, 0, width];
-  const translateY = scrollX.interpolate({
+const Ticker = ({ onPageScrollOffset, onPageScrollPosition }) => {
+  const inputRange = [0, data.length];
+  const translateY = Animated.add(
+    onPageScrollOffset,
+    onPageScrollPosition
+  ).interpolate({
     inputRange,
-    outputRange: [TICKER_HEIGHT, 0, -TICKER_HEIGHT],
+    outputRange: [0, data.length * -TICKER_HEIGHT],
   });
   return (
     <View style={styles.tickerContainer}>
@@ -123,6 +125,7 @@ const Item = ({
   description,
   index,
   onPageScrollOffset,
+  onPageScrollPosition,
 }) => {
   const inputRange = [0, 0.5, 0.99];
   const inputRangeOpacity = [0, 0.5, 0.99];
@@ -130,15 +133,7 @@ const Item = ({
     inputRange,
     outputRange: [1, 0, 1],
   });
-  // const translateXHeading = onPageScrollOffset.interpolate({
-  //   inputRange,
-  //   outputRange: [0, width * 0.1, 0],
-  //   // outputRange: [width * 0.1, 0, -width * 0.1],
-  // });
-  // const translateXDescription = onPageScrollOffset.interpolate({
-  //   inputRange,
-  //   outputRange: [width * 0.7, 0, -width * 0.7],
-  // });
+
   const opacity = onPageScrollOffset.interpolate({
     inputRange: inputRangeOpacity,
     outputRange: [1, 0, 1],
@@ -187,12 +182,16 @@ const Item = ({
   );
 };
 
-const Pagination = ({ scrollX }) => {
-  const inputRange = [-width, 0, width];
-  const translateX = scrollX.interpolate({
+const Pagination = ({ onPageScrollOffset, onPageScrollPosition }) => {
+  const inputRange = [0, data.length];
+  const translateX = Animated.add(
+    onPageScrollOffset,
+    onPageScrollPosition
+  ).interpolate({
     inputRange,
-    outputRange: [-DOT_SIZE, 0, DOT_SIZE],
+    outputRange: [0, data.length * DOT_SIZE],
   });
+
   return (
     <View style={[styles.pagination]}>
       <Animated.View
@@ -200,7 +199,7 @@ const Pagination = ({ scrollX }) => {
           styles.paginationIndicator,
           {
             position: 'absolute',
-            transform: [{ translateX }],
+            transform: [{ translateX: translateX }],
           },
         ]}
       />
@@ -226,7 +225,7 @@ export default function HeadphonesCarouselExample() {
 
   return (
     <View style={styles.container}>
-      <Circle scrollX={scrollX} />
+      <Circle onPageScrollOffset={onPageScrollOffset} />
       <AnimatedViewPager
         initialPage={0}
         style={{ width: '100%', height: '100%' }}
@@ -248,15 +247,12 @@ export default function HeadphonesCarouselExample() {
         )}
       >
         {data.map((item, index) => (
-          <View
-            // style={{ backgroundColor: 'red' }}
-            collapsable={false}
-            key={index}
-          >
+          <View collapsable={false} key={index}>
             <Item
               {...item}
               index={index}
               onPageScrollOffset={onPageScrollOffset}
+              onPageScrollPosition={onPageScrollPosition}
             />
           </View>
         ))}
@@ -265,8 +261,14 @@ export default function HeadphonesCarouselExample() {
         style={styles.logo}
         source={require('../assets/ue_black_logo.png')}
       />
-      <Pagination scrollX={scrollX} />
-      <Ticker scrollX={scrollX} />
+      <Pagination
+        onPageScrollOffset={onPageScrollOffset}
+        onPageScrollPosition={onPageScrollPosition}
+      />
+      <Ticker
+        onPageScrollOffset={onPageScrollOffset}
+        onPageScrollPosition={onPageScrollPosition}
+      />
     </View>
   );
 }
