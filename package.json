@@ -121,5 +121,10 @@
       "module",
       "typescript"
     ]
+  },
+  "dependencies": {
+    "navigation": "^5.3.1",
+    "navigation-react": "^4.1.1",
+    "navigation-react-native": "^7.3.2"
   }
 }

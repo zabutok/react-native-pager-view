@@ -1,76 +1,96 @@
-import * as React from 'react';
-import { StyleSheet, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { BasicViewPagerExample } from './BasicViewPagerExample';
-import { KeyboardExample } from './KeyboardExample';
-import { OnPageScrollExample } from './OnPageScrollExample';
-import { OnPageSelectedExample } from './OnPageSelectedExample';
-import { ScrollableViewPagerExample } from './ScrollableViewPagerExample';
-import { ScrollViewInsideExample } from './ScrollViewInsideExample';
-import HeadphonesCarouselExample from './HeadphonesCarouselExample';
-import PaginationDotsExample from './PaginationDotsExample';
+import React, { useMemo, useContext, useCallback } from 'react';
+import { StyleSheet, View, TouchableNativeFeedback, Text } from 'react-native';
+import ViewPager from '@react-native-community/viewpager';
+import { StateNavigator } from 'navigation';
+import { NavigationHandler, NavigationContext } from 'navigation-react';
+import { NavigationStack } from 'navigation-react-native';
 
-const examples = [
-  { component: BasicViewPagerExample, name: 'Basic Example' },
-  { component: KeyboardExample, name: 'Keyboard Example' },
-  { component: OnPageScrollExample, name: 'OnPageScroll Example' },
-  { component: OnPageSelectedExample, name: 'OnPageSelected Example' },
-  { component: HeadphonesCarouselExample, name: 'Headphones Carousel Example' },
-  { component: PaginationDotsExample, name: 'Pagination Dots Example' },
-  {
-    component: ScrollableViewPagerExample,
-    name: 'Scrollable ViewPager Example',
-  },
-  {
-    component: ScrollViewInsideExample,
-    name: 'ScrollView inside ViewPager Example',
-  },
-];
-
-function App() {
-  const navigation = useNavigation();
+export const Button = ({ children, onPress }) => {
   return (
-    <ScrollView>
-      {examples.map((example) => (
-        <TouchableOpacity
-          key={example.name}
-          style={styles.exampleTouchable}
-          onPress={() => {
-            navigation.navigate(example.name);
-          }}
-        >
-          <Text style={styles.exampleText}>{example.name}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+    <TouchableNativeFeedback onPress={onPress}>
+      <View style={styles.container}>
+        <Text style={styles.label}>{children}</Text>
+      </View>
+    </TouchableNativeFeedback>
   );
-}
+};
 
-const Stack = createStackNavigator();
-
-export function Navigation() {
+const Screen1 = () => {
+  const { stateNavigator } = useContext(NavigationContext);
+  const onPress = useCallback(() => {
+    stateNavigator.navigate('screen2');
+  }, [stateNavigator]);
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="ViewPager Example">
-        <Stack.Screen name="ViewPager Example" component={App} />
-        {examples.map((example, index) => (
-          <Stack.Screen
-            key={index}
-            name={example.name}
-            component={example.component}
-          />
-        ))}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ViewPager style={styles.viewPager} initialPage={0}>
+      <View key="1" style={styles.page1}>
+        <Button onPress={onPress}>Go to next screen</Button>
+      </View>
+      <View key="2" style={styles.page2} />
+    </ViewPager>
   );
-}
+};
+
+const Screen2 = () => {
+  const { stateNavigator } = useContext(NavigationContext);
+  const onPress = useCallback(() => {
+    stateNavigator.navigateBack(1);
+  }, [stateNavigator]);
+  return (
+    <View style={styles.screen2}>
+      <Button onPress={onPress}>Go back</Button>
+    </View>
+  );
+};
+
+const App = () => {
+  const stateNavigator = useMemo(() => {
+    var stateNavigator = new StateNavigator([
+      { key: 'screen1' },
+      { key: 'screen2', trackCrumbTrail: true },
+    ]);
+    stateNavigator.states.screen1.renderScene = () => <Screen1 />;
+    stateNavigator.states.screen2.renderScene = () => <Screen2 />;
+    stateNavigator.navigate('screen1');
+    return stateNavigator;
+  }, []);
+
+  return (
+    <NavigationHandler stateNavigator={stateNavigator}>
+      <NavigationStack />
+    </NavigationHandler>
+  );
+};
 
 const styles = StyleSheet.create({
-  exampleTouchable: {
-    padding: 16,
+  container: {
+    padding: 8,
+    backgroundColor: 'blue',
+    elevation: 2,
+    borderRadius: 4,
   },
-  exampleText: {
-    fontSize: 16,
+  label: {
+    color: 'white',
+  },
+  viewPager: {
+    flex: 1,
+  },
+  page1: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'red',
+  },
+  page2: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'green',
+  },
+  screen2: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
+
+export default App;
