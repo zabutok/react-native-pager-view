@@ -139,6 +139,7 @@ public class ReactViewPagerManager extends ViewGroupManager<ViewPager2> {
 
 
     public void removeAllViews(ViewPager2 parent) {
+        //https://github.com/callstack/react-native-viewpager/pull/295
         parent.setUserInputEnabled(false);
         FragmentAdapter adapter = ((FragmentAdapter) parent.getAdapter());
         adapter.removeAll();
