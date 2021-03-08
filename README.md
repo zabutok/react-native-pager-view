@@ -1,31 +1,8 @@
-# react-native-viewpager
-
-[![CircleCI branch](https://img.shields.io/circleci/build/github/callstack/react-native-viewpager/master.svg)](https://circleci.com/gh/callstack/react-native-viewpager/tree/master)
-[![npm package](https://badge.fury.io/js/%40react-native-community%2Fviewpager.svg)](https://badge.fury.io/js/%40react-native-community%2Fviewpager)
-[![Lean Core Extracted](https://img.shields.io/badge/Lean%20Core-Extracted-brightgreen.svg)](https://github.com/facebook/react-native/issues/23313)
-[![License](https://img.shields.io/github/license/react-native-community/react-native-viewpager?color=blue)](https://github.com/callstack/react-native-viewpager/blob/master/LICENSE)
-
-This component allows the user to swipe left and right through pages of data. Under the hood it is using the native [Android ViewPager](https://developer.android.com/reference/android/support/v4/view/ViewPager) and the [iOS UIPageViewController](https://developer.apple.com/documentation/uikit/uipageviewcontroller) implementations. [See it in action!](https://github.com/react-native-community/react-native-viewpager#preview)
-
-<img src="docs/viewpager-logo.png" alt="ViewPager" width="500" height="500">
-
-## Versions
-
-| 1.x              | 2.x              | 3.x              | 4.0.x, 4.1.x       | >= 4.2.x                                                                                               |
-| ---------------- | -------------    | -------------    | -------------      | -------------                                                                                       |
-|                  | iOS support      | iOS support      | iOS support        | iOS support                                                                                         |
-| Android support  | Android support  | AndroidX support | ViewPager2 support | [Reverted to 3.3.0](https://github.com/callstack/react-native-viewpager/issues/233#issue-711000654) |
-
-
-## Experimental version
-
-[ViewPager2](https://developer.android.com/jetpack/androidx/releases/viewpager2) for Android uses another implementation than ViewPager1, hence it caused lots of issues. You can try experimental version using below command 
-
-`yarn add @react-native-community/viewpager@next`
+# react-native-pager-view <img src="docs/viewpager-logo.png" alt="ViewPager" width="24" height="24">
 
 ## Getting started
 
-`yarn add @react-native-community/viewpager`
+`yarn add react-native-pager-view`
 
 ## Linking 
 
@@ -37,7 +14,7 @@ Autolinking will just do the job.
 
 #### Mostly automatic
 
-`react-native link @react-native-community/viewpager`
+`react-native link react-native-pager-view`
 
 #### Manual linking
 
@@ -48,7 +25,7 @@ Autolinking will just do the job.
 Follow the [instructions in the React Native documentation](https://facebook.github.io/react-native/docs/linking-libraries-ios#manual-linking) to manually link the framework or link using [Cocoapods](https://cocoapods.org) by adding this to your `Podfile`:
 
 ```ruby
-pod 'react-native-viewpager', :path => '../node_modules/@react-native-community/viewpager'
+pod 'react-native-pager-view', :path => '../node_modules/react-native-pager-view'
 ```
 </details>
 
@@ -59,15 +36,15 @@ Make the following changes:
 
 #### `android/settings.gradle`
 ```groovy
-include ':@react-native-community_viewpager'
-project(':@react-native-community_viewpager').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/viewpager/android')
+include ':react-native-pager-view'
+project(':react-native-pager-view').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pager-view/android')
 ```
 
 #### `android/app/build.gradle`
 ```groovy
 dependencies {
    ...
-   implementation project(':@react-native-community_viewpager')
+   implementation project(':react-native-pager-view')
 }
 ```
 
@@ -96,7 +73,7 @@ protected List<ReactPackage> getPackages() {
 ```js
 import React from 'react';
 import {StyleSheet, View, Text} from 'react-native';
-import ViewPager from '@react-native-community/viewpager';
+import ViewPager from 'react-native-pager-view';
 
 const MyPager = () => {
   return (
@@ -120,9 +97,6 @@ const styles = StyleSheet.create({
 
 **Attention:** Note that you can only use `View` components as children of `ViewPager` (cf. folder */example*)
 . For Android if `View` has own children, set prop `collapsable` to false https://reactnative.dev/docs/view#collapsable, otherwise react-native might remove those children views and  and it's children will be rendered as separate pages
-
-## Advanced usage
-For advanced usage please take a look into our [example project](https://github.com/callstack/react-native-viewpager/blob/master/example/src/BasicViewPagerExample.tsx) 
 
 ## API
 
