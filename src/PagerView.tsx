@@ -71,6 +71,7 @@ export class PagerView<ItemT> extends React.PureComponent<
         windowLength: prevState.windowLength,
       })
     );
+    console.log(animated);
     // Send paging command.
     requestAnimationFrame(() => {
       UIManager.dispatchViewManagerCommand(
@@ -125,6 +126,7 @@ export class PagerView<ItemT> extends React.PureComponent<
       }
     }
 
+    // console.log({ buffer, offset, maxRenderWindow, windowLength });
     return { offset, windowLength };
   }
 
@@ -162,7 +164,7 @@ export class PagerView<ItemT> extends React.PureComponent<
     const keys: string[] = [];
     return {
       children: this.props.data
-        .slice(offset, offset + windowLength)
+        .slice(0, offset + windowLength)
         .map((item, index) => {
           const key = this.props.keyExtractor(item, offset + index);
           keys.push(key);
@@ -180,6 +182,7 @@ export class PagerView<ItemT> extends React.PureComponent<
     const { offset, windowLength } = this.state;
     const { children, keys } = this.renderChildren(offset, windowLength);
 
+    console.log(children.length);
     return (
       <PagerViewViewManager
         childrenKeys={keys}

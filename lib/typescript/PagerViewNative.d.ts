@@ -17,5 +17,10 @@ declare type PagerViewNativeProps = {
     style: StyleProp<ViewStyle>;
     transitionStyle?: TransitionStyle;
 };
-export declare const PagerViewNative: import("react-native").HostComponent<PagerViewNativeProps>;
+export declare const PagerViewViewManager: import("react-native").HostComponent<PagerViewNativeProps>;
+export declare function getViewManagerConfig(viewManagerName?: string): {
+    Commands: {
+        [key: string]: number;
+    };
+};
 export {};

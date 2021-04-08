@@ -1,10 +1,13 @@
 package com.reactnativepagerview
 
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.facebook.infer.annotation.Assertions
 import com.facebook.react.bridge.ReadableArray
+import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.PixelUtil
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.UIManagerModule
@@ -14,6 +17,8 @@ import com.facebook.react.uimanager.events.EventDispatcher
 import com.reactnativepagerview.event.PageScrollEvent
 import com.reactnativepagerview.event.PageScrollStateChangedEvent
 import com.reactnativepagerview.event.PageSelectedEvent
+import java.util.logging.Logger
+
 
 class PagerViewViewManager : ViewGroupManager<ViewPager2>() {
     private lateinit var eventDispatcher: EventDispatcher
@@ -26,21 +31,25 @@ class PagerViewViewManager : ViewGroupManager<ViewPager2>() {
         val vp = ViewPager2(reactContext)
         val adapter = FragmentAdapter((reactContext.currentActivity as FragmentActivity?)!!)
         vp.adapter = adapter
+        //https://github.com/callstack/react-native-viewpager/issues/183
+        vp.isSaveEnabled = false
         eventDispatcher = reactContext.getNativeModule(UIManagerModule::class.java)!!.eventDispatcher
         vp.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
                 eventDispatcher.dispatchEvent(
                         PageScrollEvent(vp.id, position, positionOffset))
             }
 
             override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
                 eventDispatcher.dispatchEvent(
                         PageSelectedEvent(vp.id, position))
-                adapter.onPageSelected(position)
             }
 
             override fun onPageScrollStateChanged(state: Int) {
-                val pageScrollState = when (state) {
+                super.onPageScrollStateChanged(state)
+                val pageScrollState: String = when (state) {
                     ViewPager2.SCROLL_STATE_IDLE -> "idle"
                     ViewPager2.SCROLL_STATE_DRAGGING -> "dragging"
                     ViewPager2.SCROLL_STATE_SETTLING -> "settling"
@@ -53,106 +62,141 @@ class PagerViewViewManager : ViewGroupManager<ViewPager2>() {
         return vp
     }
 
+    private fun setCurrentItem(view: ViewPager2, selectedTab: Int, scrollSmooth: Boolean) {
+        view.post {
+            view.measure(
+                    View.MeasureSpec.makeMeasureSpec(view.width, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(view.height, View.MeasureSpec.EXACTLY))
+            view.layout(view.left, view.top, view.right, view.bottom)
+        }
+        view.setCurrentItem(selectedTab, false)
+    }
+
     override fun addView(parent: ViewPager2, child: View, index: Int) {
-        val adapter = parent.adapter as FragmentAdapter
-        adapter.addReactView(child, index)
-        postUpdate(parent, adapter)
+        if (child == null) {
+            return
+        }
+        (parent.adapter as FragmentAdapter?)!!.addFragment(child, index)
+        Log.v("PagerViewManager", "addView $index")
+    }
+
+    override fun addViews(parent: ViewPager2?, views: MutableList<View>?) {
+        super.addViews(parent, views)
+        Log.v("PagerViewManager", "addViews ${views?.size}")
     }
 
     override fun getChildCount(parent: ViewPager2): Int {
-        return (parent.adapter as FragmentAdapter).getReactChildCount()
+        Log.v("PagerViewManager", "getChildCount ${parent.adapter!!.itemCount}")
+        return parent.adapter!!.itemCount
     }
 
     override fun getChildAt(parent: ViewPager2, index: Int): View {
-        return (parent.adapter as FragmentAdapter).getReactChildAt(index)
+        Log.v("PagerViewManager", "getChildAt ${index}")
+        return (parent.adapter as FragmentAdapter?)!!.getChildViewAt(index)
+    }
+
+    override fun removeView(parent: ViewPager2, view: View) {
+        Log.v("PagerViewManager", "removeView ")
+        (parent.adapter as FragmentAdapter?)!!.removeFragment(view)
+    }
+
+    override fun removeAllViews(parent: ViewPager2) {
+        Log.v("PagerViewManager", "removeAllViews ")
+        parent.isUserInputEnabled = false
+        val adapter = parent.adapter as FragmentAdapter?
+        adapter!!.removeAll()
     }
 
     override fun removeViewAt(parent: ViewPager2, index: Int) {
-        val adapter = parent.adapter as FragmentAdapter
-        adapter.removeReactViewAt(index)
-        postUpdate(parent, adapter)
+        Log.v("PagerViewManager", "removeViewAt ")
+        val adapter = parent.adapter as FragmentAdapter?
+        adapter!!.removeFragmentAt(index)
     }
 
-    override fun getExportedCustomDirectEventTypeConstants(): Map<String, Map<String, String>> {
-        return mapOf(
-                PageScrollEvent.EVENT_NAME to mapOf("registrationName" to "onPageScroll"),
-                PageScrollStateChangedEvent.EVENT_NAME to mapOf("registrationName" to "onPageScrollStateChanged"),
-                PageSelectedEvent.EVENT_NAME to mapOf("registrationName" to "onPageSelected")
-        )
+    override fun needsCustomLayoutForChildren(): Boolean {
+        return true
     }
 
-    override fun onAfterUpdateTransaction(view: ViewPager2) {
-        super.onAfterUpdateTransaction(view)
-        updatePager(view, (view.adapter as FragmentAdapter).getTransactionId())
-    }
-
-    override fun getCommandsMap() = mapOf(
-            "setPage" to COMMAND_SET_PAGE,
-            "setScrollEnabled" to COMMAND_SET_SCROLL_ENABLED
-    )
-
-    override fun receiveCommand(view: ViewPager2, commandId: Int, args: ReadableArray?) {
-        if (args != null) {
-            when (commandId) {
-                COMMAND_SET_PAGE -> {
-                    setCurrentItem(view, args.getInt(0), args.getBoolean(1))
-                    return
-                }
-                COMMAND_SET_SCROLL_ENABLED -> {
-                    view.isUserInputEnabled = args.getBoolean(0)
-                    return
-                }
-            }
-        }
-        throw IllegalArgumentException(String.format(
-                "Unsupported command %d received by %s.",
-                commandId,
-                javaClass.simpleName))
-    }
-
-    @ReactProp(name = "childrenKeys")
-    fun setChildrenKeys(view: ViewPager2, childrenKeys: ReadableArray) {
-        val adapter = view.adapter as FragmentAdapter
-        val numKeys = childrenKeys.size()
-        for (i in 0 until numKeys) {
-            childrenKeys.getString(i)?.let { adapter.queueKeyToProcess(it) }
-        }
-    }
-
-    @ReactProp(name = "count")
-    fun setCount(view: ViewPager2, count: Int) {
-        (view.adapter as FragmentAdapter).setCount(count)
-    }
-
-    @ReactProp(name = "offscreenPageLimit", defaultInt = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT)
-    fun setOffscreenPageLimit(view: ViewPager2, limit: Int) {
-        view.offscreenPageLimit = limit
-    }
-
-    @ReactProp(name = "offset")
-    fun setOffset(view: ViewPager2, offset: Int) {
-        (view.adapter as FragmentAdapter).setOffset(offset)
+    @ReactProp(name = "scrollEnabled", defaultBoolean = true)
+    fun setScrollEnabled(viewPager: ViewPager2, value: Boolean) {
+        viewPager.isUserInputEnabled = value
     }
 
     @ReactProp(name = "orientation")
-    fun setOrientation(view: ViewPager2, orientation: String) {
-        view.orientation = if (("vertical" == orientation)) ViewPager2.ORIENTATION_VERTICAL else ViewPager2.ORIENTATION_HORIZONTAL
+    fun setOrientation(viewPager: ViewPager2, value: String) {
+        viewPager.orientation = if (value == "vertical") ViewPager2.ORIENTATION_VERTICAL else ViewPager2.ORIENTATION_HORIZONTAL
     }
 
-    @ReactProp(name = "overdrag", defaultBoolean = true)
-    fun setOverdrag(view: ViewPager2, overdrag: Boolean) {
-        view.getChildAt(0).overScrollMode = if (overdrag) ViewPager2.OVER_SCROLL_IF_CONTENT_SCROLLS else ViewPager2.OVER_SCROLL_NEVER
+    @ReactProp(name = "offscreenPageLimit", defaultInt = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT)
+    operator fun set(viewPager: ViewPager2, value: Int) {
+        viewPager.offscreenPageLimit = value
     }
 
-    @ReactProp(name = "pageMargin", defaultFloat = 0f)
-    fun setPageMargin(view: ViewPager2, margin: Float) {
+    @ReactProp(name = "overScrollMode")
+    fun setOverScrollMode(viewPager: ViewPager2, value: String) {
+        val child = viewPager.getChildAt(0)
+        if (value == "never") {
+            child.overScrollMode = ViewPager2.OVER_SCROLL_NEVER
+        } else if (value == "always") {
+            child.overScrollMode = ViewPager2.OVER_SCROLL_ALWAYS
+        } else {
+            child.overScrollMode = ViewPager2.OVER_SCROLL_IF_CONTENT_SCROLLS
+        }
+    }
+
+    override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Map<String, String>> {
+        return MapBuilder.of(
+                PageScrollEvent.EVENT_NAME, MapBuilder.of("registrationName", "onPageScroll"),
+                PageScrollStateChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onPageScrollStateChanged"),
+                PageSelectedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onPageSelected"))
+    }
+
+    override fun getCommandsMap(): Map<String, Int>? {
+        return MapBuilder.of(
+                "setPage",
+                COMMAND_SET_PAGE,
+                "setPageWithoutAnimation",
+                COMMAND_SET_PAGE_WITHOUT_ANIMATION,
+                "setScrollEnabled",
+                COMMAND_SET_SCROLL_ENABLED)
+    }
+
+    override fun receiveCommand(root: ViewPager2, commandId: Int, args: ReadableArray?) {
+        super.receiveCommand(root, commandId, args)
+        Assertions.assertNotNull(root)
+        Assertions.assertNotNull(args)
+        when (commandId) {
+            COMMAND_SET_PAGE -> {
+                setCurrentItem(root, args!!.getInt(0), true)
+                eventDispatcher!!.dispatchEvent(PageSelectedEvent(root.id, args.getInt(0)))
+                return
+            }
+            COMMAND_SET_PAGE_WITHOUT_ANIMATION -> {
+                setCurrentItem(root, args!!.getInt(0), false)
+                eventDispatcher!!.dispatchEvent(PageSelectedEvent(root.id, args.getInt(0)))
+                return
+            }
+            COMMAND_SET_SCROLL_ENABLED -> {
+                root.isUserInputEnabled = args!!.getBoolean(0)
+                return
+            }
+            else -> throw IllegalArgumentException(String.format(
+                    "Unsupported command %d received by %s.",
+                    commandId,
+                    javaClass.simpleName))
+        }
+    }
+
+    @ReactProp(name = "pageMargin", defaultFloat = 0F)
+    fun setPageMargin(pager: ViewPager2, margin: Float) {
         val pageMargin = PixelUtil.toPixelFromDIP(margin).toInt()
-
-        // Don't use MarginPageTransformer to be able to support negative margins.
-        view.setPageTransformer { page, position ->
+        /**
+         * Don't use MarginPageTransformer to be able to support negative margins
+         */
+        pager.setPageTransformer { page, position ->
             val offset = pageMargin * position
-            if (view.orientation == ViewPager2.ORIENTATION_HORIZONTAL) {
-                val isRTL = view.layoutDirection == View.LAYOUT_DIRECTION_RTL
+            if (pager.orientation == ViewPager2.ORIENTATION_HORIZONTAL) {
+                val isRTL = pager.layoutDirection == View.LAYOUT_DIRECTION_RTL
                 page.translationX = if (isRTL) -offset else offset
             } else {
                 page.translationY = offset
@@ -160,39 +204,10 @@ class PagerViewViewManager : ViewGroupManager<ViewPager2>() {
         }
     }
 
-    @ReactProp(name = "scrollEnabled", defaultBoolean = true)
-    fun setScrollEnabled(view: ViewPager2, enabled: Boolean) {
-        view.isUserInputEnabled = enabled
-    }
-
-    private fun updatePager(view: ViewPager2, transactionId: Int) {
-        val adapter = view.adapter as FragmentAdapter
-        val position = adapter.onAfterUpdateTransaction(transactionId)
-        if (position != null) {
-            eventDispatcher.dispatchEvent(
-                    PageSelectedEvent(view.id, position))
-            adapter.onPageSelected(position)
-        }
-    }
-
-    private fun postUpdate(view: ViewPager2, adapter: FragmentAdapter) {
-        val transactionId = adapter.getTransactionId()
-        view.post { updatePager(view, transactionId) }
-    }
-
-    private fun setCurrentItem(view: ViewPager2, item: Int, smoothScroll: Boolean) {
-        view.post {
-            view.measure(
-                    View.MeasureSpec.makeMeasureSpec(view.width, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(view.height, View.MeasureSpec.EXACTLY))
-            view.layout(view.left, view.top, view.right, view.bottom)
-        }
-        view.setCurrentItem(item, smoothScroll)
-    }
-
     companion object {
         private const val REACT_CLASS = "RNCViewPager"
         private const val COMMAND_SET_PAGE = 1
-        private const val COMMAND_SET_SCROLL_ENABLED = 2
+        private const val COMMAND_SET_PAGE_WITHOUT_ANIMATION = 2
+        private const val COMMAND_SET_SCROLL_ENABLED = 3
     }
 }

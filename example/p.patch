@@ -1,0 +1,50 @@
+diff --git a/example/src/BasicPagerViewExample.tsx b/example/src/BasicPagerViewExample.tsx
+index 99d49f0..7529e66 100644
+--- a/example/src/BasicPagerViewExample.tsx
++++ b/example/src/BasicPagerViewExample.tsx
+@@ -1,4 +1,4 @@
+-import React from 'react';
++import React, { useEffect } from 'react';
+ import { Image, SafeAreaView, StyleSheet, View } from 'react-native';
+ 
+ import { PagerView } from 'react-native-pager-view';
+@@ -8,7 +8,14 @@ import { NavigationPanel } from './component/NavigationPanel';
+ import { useNavigationPanel } from './hook/useNavigationPanel';
+ import { CreatePage, createPageKeyExtractor } from './utils';
+ 
+-function renderItem({ item }: { item: CreatePage }) {
++function TrackingRender({ item }: { item: CreatePage }) {
++  useEffect(() => {
++    console.log(`didmout ${item.key}`);
++    return () => {
++      console.log(`didunmout ${item.key}`);
++    };
++  }, [item.key]);
++
+   return (
+     <View style={item.style}>
+       <Image style={styles.image} source={item.imgSource} />
+@@ -17,15 +24,21 @@ function renderItem({ item }: { item: CreatePage }) {
+   );
+ }
+ 
++function renderItem({ item }: { item: CreatePage }) {
++  return <TrackingRender item={item} />;
++}
++
+ export function BasicPagerViewExample() {
+-  const { ref, ...navigationPanel } = useNavigationPanel<CreatePage>();
++  const { ref, ...navigationPanel } = useNavigationPanel<CreatePage>(10000);
+ 
+   return (
+     <SafeAreaView style={styles.container}>
+       <PagerView
++        buffer={2}
+         ref={ref}
+         style={styles.pagerView}
+         scrollEnabled={navigationPanel.scrollEnabled}
++        maxRenderWindow={20}
+         onPageScroll={navigationPanel.onPageScroll}
+         onPageSelected={navigationPanel.onPageSelected}
+         onPageScrollStateChanged={navigationPanel.onPageScrollStateChanged}
+         

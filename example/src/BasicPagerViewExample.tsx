@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, SafeAreaView, StyleSheet, View } from 'react-native';
 
 import { PagerView } from 'react-native-pager-view';
@@ -8,7 +8,15 @@ import { NavigationPanel } from './component/NavigationPanel';
 import { useNavigationPanel } from './hook/useNavigationPanel';
 import { CreatePage, createPageKeyExtractor } from './utils';
 
-function renderItem({ item }: { item: CreatePage }) {
+function TrackingRender({ item }: { item: CreatePage }) {
+  useEffect(() => {
+    console.log(`didmout ${item.key}`);
+    return () => {
+      console.log(`didunmout ${item.key}`);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <View style={item.style}>
       <Image style={styles.image} source={item.imgSource} />
@@ -17,15 +25,21 @@ function renderItem({ item }: { item: CreatePage }) {
   );
 }
 
+function renderItem({ item }: { item: CreatePage }) {
+  return <TrackingRender item={item} />;
+}
+
 export function BasicPagerViewExample() {
-  const { ref, ...navigationPanel } = useNavigationPanel<CreatePage>();
+  const { ref, ...navigationPanel } = useNavigationPanel<CreatePage>(10000);
 
   return (
     <SafeAreaView style={styles.container}>
       <PagerView
+        buffer={2}
         ref={ref}
         style={styles.pagerView}
         scrollEnabled={navigationPanel.scrollEnabled}
+        maxRenderWindow={6}
         onPageScroll={navigationPanel.onPageScroll}
         onPageSelected={navigationPanel.onPageSelected}
         onPageScrollStateChanged={navigationPanel.onPageScrollStateChanged}
