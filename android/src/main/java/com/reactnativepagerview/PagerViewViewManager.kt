@@ -23,6 +23,7 @@ import com.reactnativepagerview.event.PageSelectedEvent
 class PagerViewViewManager : ViewGroupManager<ViewPager2>() {
   private lateinit var eventDispatcher: EventDispatcher
   private lateinit var lifecycleEventListener: LifecycleEventListener
+  private var views: MutableList<View> = mutableListOf();
 
 
   override fun getName(): String {
@@ -42,6 +43,10 @@ class PagerViewViewManager : ViewGroupManager<ViewPager2>() {
       override fun onHostResume() {
         if(vp.adapter == null && reactContext.hasCurrentActivity()) {
           vp.adapter = createFragmentAdapter(reactContext)
+          if(views.count() > 0) {
+            addViews(vp, views!!)
+            views.clear()
+          }
         }
       }
       override fun onHostPause() {}
@@ -91,6 +96,10 @@ class PagerViewViewManager : ViewGroupManager<ViewPager2>() {
 
   override fun addView(parent: ViewPager2, child: View, index: Int) {
     if (child == null) {
+      return
+    }
+    if (parent.adapter == null) {
+      views.add(child)
       return
     }
     (parent.adapter as FragmentAdapter?)?.addFragment(child, index)
